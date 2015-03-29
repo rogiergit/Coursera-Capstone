@@ -4,6 +4,22 @@ author: Rogier H
 output: html_document
 ---
 
+# Chapters
+1. Summary  
+2. Used packages  
+3. Getting data  
+4. Cleaning data  
+5. Dataset statistics  
+6. Sample dataset
+7. Exploratory analysis
+
+
+## Summary
+This document describes the steps taken in part 1 of the Coursera Capstone project. Goal of this project is to load and clean the datasets and to perform an exploratory analysis on the data. In preparation for the modelling/prediction phase we're going to analyse the usage of words and combination of words. For this analysis we have used techniques from the field of Natural Language Processing (NLP).
+
+All code used for this project can be viewed from GitHub: https://github.com/rogiergit/Coursera-Capstone
+
+## Used packages
 ```{r,message=FALSE, error=FALSE, warning=FALSE, results="hide"}
 #Load libraries
 library(stylo) #For n-grams
@@ -12,27 +28,22 @@ library(stringi) #For stri_count
 library(ggplot2)
 ```` 
 
-## Summary
-This document describes the steps taken in part 1 of the Coursera Capstone project. Goal of this project is to load and clean the datasets and to perform an exploratory analysis on the data. In preparation for the modelling/prediction phase we're going to analyse the usage of words and combination of words. For this analysis we have used techniques from the field of Natural Language Processing (NLP).
-
-All code used for this project can be viewed in the final paragraph.
-
 ## Getting data
-The project has files in several languages. For this project we're going to use the en/US files. The en/US files contain the following datasets:
-* blogs
-* news
-* twitter
+The project has files in several languages. For this project we're going to use the en/US files. The en/US files contain the following datasets:  
+* blogs  
+* news  
+* twitter  
 
 Each dataset has several lines of text. One line of text can contain 1 or multiple sentences. 
 
-## cleaning data
-For each of the three datasets we have cleaned the lines of text by:
-1 Removing non-alpabetic characters; these are replaces by spaces
-2 Removing double spaces
+## Cleaning data
+For each of the three datasets we have cleaned the lines of text by:  
+1 Removing non-alpabetic characters; these are replaces by spaces  
+2 Removing double spaces  
 
-Endresult for each dataset are lines containg only words.
+Endresult for each dataset are lines containing only words.
 
-```{r,message=FALSE, error=FALSE, warning=FALSE, results="hide"}
+```{r,echo=FALSE, message=FALSE, error=FALSE, warning=FALSE, results="hide"}
 setwd("E:\\Dev\\R\\Coursera\\Capstone\\Coursera-Capstone\\")
 
 urlblogs <- "./data/en_US/en_US.blogs.txt"
@@ -51,50 +62,72 @@ text <- readLines("./data/text.txt")
 ## Dataset statistics
 Here are the statistics for each dataset
 
-```{r}
+###Blogs
+```{r, echo=FALSE}
 #Blogs
-length(blogs) #number of lines in the dataset
-mean(stri_count(blogs,regex="\\S+")) #average amount of words per line
-mean(nchar(blogs)) #average amount of characters per line
+x1 <- length(blogs)
+x2<- mean(stri_count(blogs,regex="\\S+")) 
+x3 <- mean(nchar(blogs))
 
-#News
-length(news) #number of lines in the dataset
-mean(stri_count(news,regex="\\S+")) #average amount of words per line
-mean(nchar(news)) #average amount of characters per line
+table<-cbind(x1,x2,x3)
+colnames(table) <- c("Number of lines", "Avg. words per line","Avg. characters per line")
+table
+```
 
+
+###News
+```{r, echo=FALSE}
+x1 <- length(news)
+x2<- mean(stri_count(news,regex="\\S+")) 
+x3 <- mean(nchar(news))
+
+table<-cbind(x1,x2,x3)
+colnames(table) <- c("Number of lines", "Avg. words per line","Avg. characters per line")
+table
+```
+
+###Twitter
+```{r, echo=FALSE}
 #Twitter
-length(twitter) #number of lines in the dataset
-mean(stri_count(twitter,regex="\\S+")) #average amount of words per line
-mean(nchar(twitter)) #average amount of characters per line
+x1 <- length(twitter)
+x2<- mean(stri_count(twitter,regex="\\S+")) 
+x3 <- mean(nchar(twitter))
+
+table<-cbind(x1,x2,x3)
+colnames(table) <- c("Number of lines", "Avg. words per line","Avg. characters per line")
+table
 ```
 
 ## Sample dataset
-For the creation of our model we have concatenated all 3 cleaned datasets into 1 dataset called "text". This "text" dataset is too large to perform the exploratory analysis on, so we've created a sample dataset called "textsample" of 100 random lines from the "| text" dataset.
+For the creation of our model we have concatenated all 3 cleaned datasets into 1 dataset called "text". This "text" dataset is too large to perform the exploratory analysis on, so we've created a sample dataset called "textsample" of 100 random lines from the " text" dataset.  
 
 ```{r}
-#Creating a sample set of 1000 lines for exploratory word / word combination analysis
+#Creating a sample set of 100 lines for exploratory word / word combination analysis
 textsample <- text[sample(1:length(text), 100, replace=FALSE)]
-head(textsample)
 ```
 
 ## Exploratory analysis 
-Statistics for the "textsample" dataset.
-```{r}
-#Analysing words and characters
+We start the exploratory analysis with 2 plots on the amount of words per line and the amount of characters per line. OUr final product in this project must be able to predict the next word in a sentence of x number of preceding words. We will therefore also examine the occurence of words and the occurence of combination of words.
 
+
+### Word and character analysis
+
+```{r,echo=FALSE}
 #Words per line plot
 g <- qplot(stri_count(textsample,regex="\\S+"), geom="histogram", binwidth = 1) 
 g + xlab("Words") + ylab("Number of lines") + ggtitle("Words per line")
+```
+  
 
+```{r,echo=FALSE}
 #Characters per line plot
 g <- qplot(nchar(textsample), geom="histogram", binwidth = 1) 
 g + xlab("Characters") + ylab("Number of lines") + ggtitle("Characters per line")
 ```
+
   
-OUr final product in this project must be able to predict the next word in a sentence of x number of preceding words. We will therefore examine not only the occurence of words, but also the occurence of combination of words.
-  
-# Which words occur the most?
-```{r}
+### Which words occur the most?
+```{r,echo=FALSE}
 #Analysing unique words
 textsamplewords = txt.to.words(textsample)
 textsamplewordsunique <- unique(textsamplewords)
@@ -103,14 +136,16 @@ textsamplewordsfreq <- data.frame(cbind(textsamplewordsunique, textsamplewordsco
 colnames(textsamplewordsfreq) <- c("word", "freq")
 textsamplewordsfreq$freq <- as.numeric(textsamplewordsfreq$freq)
 textsamplewordsfreq <- textsamplewordsfreq[order(-textsamplewordsfreq$freq),]
+```
 
+```{r, echo=FALSE}
 #The top 10 words in the sample dataset
 head(textsamplewordsfreq, 10)
 ```
 
 
-# Which combinations of 2 words occur the most?
-```{r}
+### Which combinations of 2 words occur the most?
+```{r, echo=FALSE}
 #Analysing 2 word combinations (2 ngram)
 textsample2ngramunique <- unique(make.ngrams(textsamplewords, ngram.size = 2))
 textsample2ngramcount <- sapply(textsample2ngramunique, function (x) {as.numeric(sum(str_count(textsample, paste("[^a-zA-Z]",x,"[^a-zA-Z]", sep="") )))}  )
@@ -119,13 +154,16 @@ colnames(textsample2ngramfreq) <- c("2 word combinations", "freq")
 textsample2ngramfreq$freq <- as.numeric(textsample2ngramfreq$freq)
 textsample2ngramfreq <- textsample2ngramfreq[order(-textsample2ngramfreq$freq),]
 
+```
+
+```{r, echo=FALSE}
 #The top 10 2-word combinations in the sample dataset
 head(textsample2ngramfreq, 10)
 ```
 
-# Which combinations of 3 words occur the most?
+### Which combinations of 3 words occur the most?
 
-```{r}
+```{r, echo=FALSE}
 textsample3ngramunique <- unique(make.ngrams(textsamplewords, ngram.size = 3))
 textsample3ngramcount <- sapply(textsample3ngramunique, function (x) {as.numeric(sum(str_count(textsample, paste("[^a-zA-Z]",x,"[^a-zA-Z]", sep="") )))}  )
 textsample3ngramfreq <- data.frame(cbind(textsample3ngramunique, textsample3ngramcount))
@@ -133,9 +171,14 @@ colnames(textsample3ngramfreq) <- c("3 word combinations", "freq")
 textsample3ngramfreq$freq <- as.numeric(textsample3ngramfreq$freq)
 textsample3ngramfreq <- textsample3ngramfreq[order(-textsample3ngramfreq$freq),]
 
+```
+
+```{r, echo=FALSE}
 #The top 10 2-word combinations in the sample dataset
 head(textsample3ngramfreq, 10)
 ```
+
+
 
 
 
